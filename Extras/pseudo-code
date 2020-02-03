@@ -1,0 +1,70 @@
+read the input file
+assign time stamp to each item
+
+if the first character of each item = to 'b':
+	count the number of every transaction state (active,waiting,aborted mode) or not
+	
+	if there is no active transaction:
+		insert a new active transaction in the transactiontable
+		
+if the first character of each item = to 'r':
+	if the transaction is active:
+		if the data item (X, Y, ...) used for the first time:
+			insert data item and the status (read, write) to the lock table and update transaction table
+		else
+			if the data item is already existing determine the type of Lock operation held on the item:
+				if read locked:
+					no conflict operation is encountered , Lock table and Transaction table are updated
+				else
+				    if write locked: 
+						retrieve the transaction id's of the transaction holding the lock and waiting for the lock.
+							if the id's are equal:
+								Apply lock and update transaction table
+							if the tid of the transaction waiting for the lock is younger than the tid of the transaction holding the lock:
+								add the id of the requested transaction along with status
+							else
+								if the tid of the transaction waiting for the lock is older than the tid of the transaction holding the lock:
+									tid of the transaction holding the lock will be aborted and the data item is released
+									
+								if released resource is write-locked by the aborted transaction:
+									if tid is waiting:
+									   allow the next transaction to perform the update operation.
+									if the released resource is read-locked by another resource:
+										delete the aborted transaction.
+									if the released resource is not read-locked by another resource:
+										if another transaction is waiting
+											 assign the lock to the next transaction
+											 update transaction table and lock table
+									
+if the first character of each item = to 'w':
+    if the transaction is active:
+		if the data item (X, Y, ...) used for the first time:
+			insert data item and the status (read, write) to the lock table and update transaction table	
+        else
+			if the data item is already existing:
+				retrieve the transaction id's of the transaction holding the lock and waiting for the lock.
+					if the id's are equal:
+								Apply lock and update transaction table
+							if the tid of the transaction waiting for the lock is younger than the tid of the transaction holding the lock:
+								add the id of the requested transaction along with status
+							else
+								if the tid of the transaction waiting for the lock is older than the tid of the transaction holding the lock:
+									tid of the transaction holding the lock will be aborted and the data item is released
+								if released resource is write-locked by the aborted transaction:
+									if tid is waiting:
+									   allow the next transaction to perform the update operation.
+									if the released resource is read-locked by another resource:
+										delete the aborted transaction.
+									if the released resource is not read-locked by another resource:
+										if another transaction is waiting
+											 assign the lock to the next transaction
+											 update transaction table and lock table
+		
+ if the first character of each item = to 'c': 
+	if the transaction is active:
+		release all the items held by the lock 
+		update transaction table and lock table
+
+Change the status of the aborted/waiting transaction to active
+by calling the function recursively		
+									
